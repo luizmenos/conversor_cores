@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Cores</title>
+
+    <link href="bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container d-flex justify-content-center align-items-center p-5">
+        <div class="card p-4 w-75">
+            <div class="card-body">
+                <h1 class="mb-4">Conversor de Cores</h1>
+                <form id="color-converter-form">
+                    <div class="mb-3">
+                        <label for="conversao" class="form-label">Selecione uma conversão:</label>
+                        <select class="form-select" id="conversao" onchange="showFields()">
+                            <option value="normalize">Normalizar RGB</option>
+                            <option value="rgbToHsv">RGB para HSV</option>
+                            <option value="hsvToRgb">HSV para RGB</option>
+                            <option value="rgbToCmyk">RGB para CMYK</option>
+                            <option value="cmykToRgb">CMYK para RGB</option>
+                            <option value="grayScale">RGB para Escala de Cinza</option>
+                        </select>
+                    </div>
+
+                    <div id="rgb-fields">
+                        <div class="mb-3">
+                            <label for="red" class="form-label">Red (0-255):</label>
+                            <input type="number" class="form-control" id="red" name="red" min="0" max="255">
+                        </div>
+                        <div class="mb-3">
+                            <label for="green" class="form-label">Green (0-255):</label>
+                            <input type="number" class="form-control" id="green" name="green" min="0" max="255">
+                        </div>
+                        <div class="mb-3">
+                            <label for="blue" class="form-label">Blue (0-255):</label>
+                            <input type="number" class="form-control" id="blue" name="blue" min="0" max="255">
+                        </div>
+                    </div>
+                    <div id="normalize-fields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="red" class="form-label">RGB Normalizado:</label>
+                            <input type="text" class="form-control" id="normalized" name="normalized" min="0" max="255"
+                                disabled>
+                        </div>
+                    </div>
+                    <div id="grayscale-fields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="red" class="form-label">Escala de Cinza:</label>
+                            <input type="text" class="form-control" id="grayscale" name="grayscale" min="0" max="255"
+                                disabled>
+                        </div>
+                    </div>
+
+                    <div id="hsv-fields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="hue" class="form-label">Hue (0-360):</label>
+                            <input type="number" class="form-control" id="hue" name="hue" min="0" max="360">
+                        </div>
+                        <div class="mb-3">
+                            <label for="saturation" class="form-label">Saturation (0-100)%:</label>
+                            <input type="number" class="form-control" id="saturation" name="saturation" min="0"
+                                max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="value" class="form-label">Value (0-100)%:</label>
+                            <input type="number" class="form-control" id="value" name="value" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div id="cmyk-fields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="cyan" class="form-label">Cyan (0-100)%:</label>
+                            <input type="number" class="form-control" id="cyan" name="cyan" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="magenta" class="form-label">Magenta (0-100)%:</label>
+                            <input type="number" class="form-control" id="magenta" name="magenta" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="yellow" class="form-label">Yellow (0-100)%:</label>
+                            <input type="number" class="form-control" id="yellow" name="yellow" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label for="key" class="form-label">Key (0-100)%:</label>
+                            <input type="number" class="form-control" id="key" name="key" min="0" max="100">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="color-preview" class="form-label">Pré-visualização da Cor:</label>
+                        <input type="color" class="form-control form-control-color" id="color-preview"
+                            name="color-preview" style="width: 250px; height: 250px;">
+                    </div>
+                    <div class="row justify-content-end">
+                        <div class="col-md-3 text-end">
+                            <button type="button" class="btn btn-primary" onclick="convertColor()">Converter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="funcoes.js"></script>
+    <script>
+        function rgbToHex(r, g, b) {
+            const componentToHex = (c) => {
+                const hex = c.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+            return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        }
+
+        function showFields() {
+            const conversao = document.getElementById('conversao').value;
+
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.disabled = true;
+            });
+
+            document.getElementById('rgb-fields').style.display = (conversao === 'normalize' || conversao ===
+                'grayScale' || conversao === 'rgbToHsv' || conversao === 'rgbToCmyk' || conversao === "hsvToRgb" ||
+                conversao === 'cmykToRgb') ? 'block' : 'none';
+            document.getElementById('hsv-fields').style.display = (conversao === 'hsvToRgb' || conversao ===
+                'rgbToHsv') ? 'block' : 'none';
+            document.getElementById('cmyk-fields').style.display = (conversao === 'cmykToRgb' || conversao ===
+                'rgbToCmyk') ? 'block' : 'none';
+            document.getElementById('normalize-fields').style.display = (conversao === 'normalize') ? 'block' : 'none';
+            document.getElementById('grayscale-fields').style.display = (conversao === 'grayScale') ? 'block' : 'none';
+
+
+            if (conversao === 'normalize' || conversao === 'grayScale' || conversao === 'rgbToHsv' || conversao ===
+                'rgbToCmyk') {
+                document.querySelectorAll('#rgb-fields .form-control').forEach(input => {
+                    input.disabled = false;
+                });
+            } else if (conversao === 'hsvToRgb') {
+                document.querySelectorAll('#hsv-fields .form-control').forEach(input => {
+                    input.disabled = false;
+                });
+            } else if (conversao === 'cmykToRgb') {
+                document.querySelectorAll('#cmyk-fields .form-control').forEach(input => {
+                    input.disabled = false;
+                });
+            }
+        }
+
+        function convertColor() {
+            const conversao = document.getElementById('conversao').value;
+            let result;
+            var cont = 0;
+            if (conversao === 'normalize' || conversao === 'grayScale' || conversao === 'rgbToHsv' || conversao ===
+                'rgbToCmyk') {
+
+                const red = parseInt(document.getElementById('red').value);
+                const green = parseInt(document.getElementById('green').value);
+                const blue = parseInt(document.getElementById('blue').value);
+
+
+                if (conversao === 'normalize') {
+                    result = normalize(red, green, blue);
+                    console.log(result);
+                    document.querySelector('#normalized').value = result[3];
+                } else if (conversao === 'grayScale') {
+                    result = grayScale(red, green, blue);
+                    console.log(result);
+                    document.querySelector('#grayScale').value = result[3];
+                } else if (conversao === 'rgbToHsv') {
+                    result = rgbToHsv(red, green, blue);
+                    document.querySelectorAll('#hsv-fields .form-control').forEach(input => {
+                        input.value = result[cont];
+                        cont++;
+                    });
+
+                } else if (conversao === 'rgbToCmyk') {
+                    result = rgbToCmyk(red, green, blue);
+
+                    document.querySelectorAll('#cmyk-fields .form-control').forEach(input => {
+                        input.value = result[cont];
+                        cont++;
+                    });
+                }
+
+                document.getElementById('color-preview').value = rgbToHex(red, green, blue);
+            } else if (conversao === 'hsvToRgb') {
+                const h = parseInt(document.getElementById('hue').value);
+                const s = parseInt(document.getElementById('saturation').value);
+                const v = parseInt(document.getElementById('value').value);
+                result = hsvToRgb(h, s, v);
+                document.querySelectorAll('#rgb-fields .form-control').forEach(input => {
+                    input.value = result[cont];
+                    cont++;
+                });
+
+                const red = result[0];
+                const green = result[1];
+                const blue = result[2];
+
+                document.getElementById('color-preview').value = rgbToHex(red, green, blue);
+
+            } else if (conversao === 'cmykToRgb') {
+                const c = parseInt(document.getElementById('cyan').value);
+                const m = parseInt(document.getElementById('magenta').value);
+                const y = parseInt(document.getElementById('yellow').value);
+                const k = parseInt(document.getElementById('key').value);
+                result = cmykToRgb(c, m, y, k);
+                document.querySelectorAll('#rgb-fields .form-control').forEach(input => {
+                    input.value = result[cont];
+                    cont++;
+                });
+
+                const red = result[0];
+                const green = result[1];
+                const blue = result[2];
+
+                document.getElementById('color-preview').value = rgbToHex(red, green, blue);
+
+            }
+        }
+
+
+        window.onload = showFields;
+    </script>
+</body>
+
+</html>

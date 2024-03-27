@@ -105,8 +105,8 @@ function grayScale(r, g, b) {
 }
 
 function normalize(r, g, b) {
-    r = Math.round(r/255);
-    g = Math.round(g/255);
-    b = Math.round(b/255);
+    r = Math.ceil((r/255) * 10) / 10;
+    g =  Math.ceil((g/255) * 10) / 10;
+    b = Math.ceil((b/255) * 10) / 10;
     return [r, g, b, `${r}, ${g}, ${b}`];
 }
